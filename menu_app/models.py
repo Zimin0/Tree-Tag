@@ -2,18 +2,27 @@ from django.db import models
 from django.urls import reverse
 
 class MenuItem(models.Model):
-    title = models.CharField(max_length=100)
-    url = models.CharField(max_length=255, blank=True)
-    name_url = models.CharField(max_length=255, blank=True)
+    title = models.CharField(max_length=200)
+    url = models.CharField(max_length=200)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
-    menu_name = models.CharField(max_length=255)
-
-    def get_absolute_url(self):
-        if self.url:
-            return self.url
-        elif self.name_url:
-            return reverse(self.name_url)
-        return '#'
+    menu_name = models.CharField(max_length=200)
 
     def __str__(self):
         return self.title
+
+    def get_ancestors(self):
+        ancestors = []
+        current_item = self.parent
+        while current_item is not None:
+            ancestors.insert(0, current_item)
+            current_item = current_item.parent
+        return ancestors
+
+    def get_children(self):
+        return MenuItem.objects.filter(parent=self)
+    
+    def get_absolute_url(self):
+        """ Returns a sting url formatted like this: /url/ """
+        if self.url:
+            return self.url
+        return '#'
