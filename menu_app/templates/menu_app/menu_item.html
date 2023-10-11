@@ -1,0 +1,19 @@
+<li class="menu-item{% if item.url == request.path %} active{% endif %}">
+    <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+    {% if item.get_children %}
+        <ul class="submenu">
+                {% for child in item.get_children %}
+                    {% if child.id not in parent_ids %}
+                        <a href="{{ child.get_absolute_url }}">{{ child.title }}</a>
+                        <br>
+                    {% endif %}
+                {% endfor %}
+                {% for child in item.get_children %}
+                    {% if child in parents %}
+                        {% include "menu_app/menu_item.html" with item=child %}
+                    {% endif %}
+                {% endfor %}
+        </ul>    
+    {% endif %}
+</li>
+
